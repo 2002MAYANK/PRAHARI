@@ -9,16 +9,31 @@ if [ -n "$DATABASE_URL" ]; then
     export DB_URL="$DATABASE_URL"
 fi
 
-# Copy .env.example if .env doesn't exist
+# Create .env file
 if [ ! -f .env ]; then
-    echo "📋 Creating .env from .env.example..."
-    cp .env.example .env
+    if [ -f .env.example ]; then
+        echo "📋 Creating .env from .env.example..."
+        cp .env.example .env
+    else
+        echo "📋 Creating minimal .env..."
+        touch .env
+    fi
+fi
+
+# Fix Windows CRLF line endings if present
+sed -i 's/\r$//' .env
+
+# Ensure APP_KEY= line exists in .env (key:generate needs it)
+if ! grep -q "^APP_KEY=" .env; then
+    echo "APP_KEY=" >> .env
 fi
 
 # Generate app key if not set or not in valid Laravel format (base64:...)
 case "$APP_KEY" in
     base64:*)
         echo "🔑 Using valid APP_KEY from environment..."
+        # Write it into .env so config:cache picks it up
+        sed -i "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|" .env
         ;;
     *)
         echo "🔑 Generating new Laravel application key..."
