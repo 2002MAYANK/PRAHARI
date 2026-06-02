@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('praharis', function (Blueprint $table) {
-            $table->string('otp', 6)->nullable()->after('phone');
-            $table->timestamp('otp_expires_at')->nullable()->after('otp');
+            $table->string('otp', 6)->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
         });
     }
 
