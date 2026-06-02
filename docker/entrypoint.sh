@@ -38,6 +38,9 @@ case "$APP_KEY" in
     *)
         echo "🔑 Generating new Laravel application key..."
         php artisan key:generate --force
+        # Export the generated key so config:cache uses it (env vars override .env)
+        export APP_KEY=$(grep '^APP_KEY=' .env | cut -d'=' -f2-)
+        echo "🔑 Generated key: ${APP_KEY}"
         ;;
 esac
 
