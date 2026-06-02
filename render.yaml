@@ -33,7 +33,7 @@ services:
       - key: APP_URL
         sync: false  # Set after first deploy (e.g. https://prahari.onrender.com)
       - key: APP_KEY
-        generateValue: true  # Render auto-generates a secure random string
+        value: ""  # Left empty; entrypoint.sh auto-generates a valid Laravel key
       - key: APP_LOCALE
         value: en
       - key: APP_MAINTENANCE_DRIVER

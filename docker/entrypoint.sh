@@ -15,13 +15,16 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-# Generate app key if not set
-if [ -z "$APP_KEY" ]; then
-    echo "🔑 Generating application key..."
-    php artisan key:generate --force
-else
-    echo "🔑 Using APP_KEY from environment..."
-fi
+# Generate app key if not set or not in valid Laravel format (base64:...)
+case "$APP_KEY" in
+    base64:*)
+        echo "🔑 Using valid APP_KEY from environment..."
+        ;;
+    *)
+        echo "🔑 Generating new Laravel application key..."
+        php artisan key:generate --force
+        ;;
+esac
 
 # Cache configuration for production performance
 echo "⚡ Caching configuration..."
