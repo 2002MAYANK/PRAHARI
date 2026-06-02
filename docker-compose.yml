@@ -1,0 +1,95 @@
+# =============================================================================
+# Docker Compose – Prahari (Local + Render-compatible)
+# =============================================================================
+# Usage:
+#   docker-compose up --build         → Build & start all services
+#   docker-compose up -d              → Start in background
+#   docker-compose down               → Stop all services
+#   docker-compose down -v            → Stop & remove database volume
+#   docker-compose logs -f app        → Tail app logs
+#   docker-compose exec app sh        → Shell into app container
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Laravel App (PHP-FPM + Nginx + Queue Worker)
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prahari-app
+    restart: unless-stopped
+    ports:
+      - "10000:10000"
+    environment:
+      # --- App ---
+      APP_NAME: Prahari
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:10000
+      APP_LOCALE: en
+      APP_MAINTENANCE_DRIVER: file
+
+      # --- Security ---
+      BCRYPT_ROUNDS: 12
+
+      # --- Logging ---
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: debug
+
+      # --- Database (PostgreSQL) ---
+      DB_CONNECTION: pgsql
+      DATABASE_URL: postgresql://prahari_user:prahari_pass@postgres:5432/prahari
+
+      # --- Session & Cache ---
+      SESSION_DRIVER: database
+      SESSION_LIFETIME: 120
+      SESSION_ENCRYPT: "false"
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      FILESYSTEM_DISK: local
+
+      # --- Mail ---
+      MAIL_MAILER: log
+      MAIL_FROM_ADDRESS: "hello@example.com"
+      MAIL_FROM_NAME: Prahari
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - prahari-network
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database (matches Render's free PostgreSQL)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: prahari-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prahari
+      POSTGRES_USER: prahari_user
+      POSTGRES_PASSWORD: prahari_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prahari_user -d prahari"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - prahari-network
+
+# =============================================================================
+# Persistent Volumes & Networks
+# =============================================================================
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  prahari-network:
+    driver: bridge
