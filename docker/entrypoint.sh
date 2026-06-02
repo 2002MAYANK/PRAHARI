@@ -54,6 +54,10 @@ php artisan view:cache
 echo "🗄️  Running database migrations..."
 php artisan migrate --force
 
+# Seed default admin user (idempotent — skips if admin already exists)
+echo "👤 Seeding default admin user..."
+php artisan db:seed --class=AdminSeeder --force
+
 # Create storage symlink
 echo "🔗 Creating storage symlink..."
 php artisan storage:link --force 2>/dev/null || true

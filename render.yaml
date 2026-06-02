@@ -87,6 +87,14 @@ services:
       - key: MAIL_FROM_NAME
         value: Prahari
 
+      # --- Default Admin (seeded on first deploy) ---
+      - key: ADMIN_NAME
+        value: Admin
+      - key: ADMIN_EMAIL
+        value: admin@prahari.com
+      - key: ADMIN_PASSWORD
+        sync: false  # Change this on Render dashboard!
+
       # --- Sanctum ---
       - key: SANCTUM_STATEFUL_DOMAINS
         sync: false  # e.g. prahari.onrender.com
