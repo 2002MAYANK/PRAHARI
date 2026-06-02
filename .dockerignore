@@ -2,11 +2,28 @@ vendor
 node_modules
 .git
 .gitignore
+.gitattributes
 .env
+.env.backup
+.phpunit.result.cache
 npm-debug.log
 yarn-error.log
-storage/logs
-storage/framework/cache
-storage/framework/sessions
-storage/framework/views
 .DS_Store
+.editorconfig
+README.md
+phpunit.xml
+
+# Storage (generated at runtime)
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
